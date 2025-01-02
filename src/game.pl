@@ -102,3 +102,6 @@ display_row([Cell|Rest]) :-
 display_cell(b) :- write(' b '). % Black piece
 display_cell(w) :- write(' w '). % White piece
 display_cell(empty) :- write(' . '). % Empty cell
+
+game_loop(state(Board, CurrentPlayer, OtherInfo)) :-
+    write('In progress...'), nl.
