@@ -1,3 +1,5 @@
+:- consult(configuration).
+
 % Main entry point
 play :-
     write('--- Welcome to Ayu ---'), nl,
@@ -45,37 +47,11 @@ setup_game(Player1, Player2) :-
     write('Enter board size (between 9 and 15): '),
     read(BoardSize),
     (  integer(BoardSize), BoardSize >= 9, BoardSize =< 15, BoardSize mod 2 =:= 1
-    -> initial_state(BoardSize, Player1, Player2, GameState),
+    -> initial_state(GameConfig(BoardSize, Player1, Player2), GameState),
        display_game(GameState),
        game_loop(GameState)
     ;  write('Invalid board size. Try again.'), nl,
        setup_game(Player1, Player2)
-    ).
-
-% Initializes the game state
-initial_state(BoardSize, Player1, Player2, game_state(Board, Player1, Player2, black)) :-
-    initialize_board(BoardSize, EmptyBoard),
-    initialize_stones(EmptyBoard, Board).
-
-% Creates an empty board
-initialize_board(Size, Board) :-
-    findall(Row, (length(Row, Size), maplist(=(empty), Row)), Board).
-
-% Fills the board with initial stones
-initialize_stones(EmptyBoard, Board) :-
-    length(EmptyBoard, Size),
-    maplist(initialize_row(Size), EmptyBoard, Board).
-
-% Adds stones to a row based on their position
-initialize_row(Size, Row, NewRow) :-
-    length(Row, Size),
-    findall(Stone, (nth1(X, Row, _), assign_stone(Size, X, Stone)), NewRow).
-
-% Assigns the initial stone placement
-assign_stone(Size, X, Stone) :-
-    (  even(X), odd(Size) -> Stone = black
-    ;  odd(X), even(Size) -> Stone = white
-    ;  Stone = empty
     ).
 
 % Display the game state
