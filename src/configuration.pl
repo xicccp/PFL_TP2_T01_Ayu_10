@@ -9,26 +9,25 @@ initial_state(config(BoardSize, Player1Type, Player2Type), state(Board, CurrentP
 % generates a board with size NxN
 generate_board(N, Board) :-
     length(Board, N),
-    findall(Row, (generate_index(1, N, Index), generate_row(N, Index, Row)), Board).
+    generate_rows(N, 1, Board).
 
-% generates a single row with alternating black and white stones
-generate_row(N, Index, Row) :- 
-    length(Row, N),
-    (Index mod 2 =:= 0 -> alternating_row(Row, w); alternating_row(Row, b)).
+% helper predicate to generate rows
+generate_rows(N, Index, [Row|Rest]) :-
+    Index =< N,
+    generate_row(N, Index, Row),
+    NextIndex is Index + 1,
+    generate_rows(N, NextIndex, Rest).
+generate_rows(N, Index, []) :-
+    Index > N.
 
-% alternates between black and white stones
-alternating_row([], _).
-alternating_row([Stone|Rest], b) :-
-    Stone = b,
-    alternating_row(Rest, w).    
-alternating_row([Stone|Rest], w) :-
-    Stone = w,
-    alternating_row(Rest, b).
+% generates a single row with alternating pieces and empty intersections
+generate_row(N, Index, Row) :-
+    (Index mod 2 =:= 0 -> alternating_row(N, Row, +, b); alternating_row(N, Row, w, +)).
 
-% generates indices from Start to End
-generate_index(Start, End, Start) :-
-    Start =< End.
-generate_index(Start, End, Index) :-
-    Start < End,
-    Next is Start + 1,
-    generate_index(Next, End, Index).
+% alternates between two symbols for N positions
+alternating_row(0, [], _, _).
+alternating_row(N, [First|Rest], FirstSymbol, SecondSymbol) :-
+    N > 0,
+    (N mod 2 =:= 0 -> First = SecondSymbol ; First = FirstSymbol),
+    NextN is N - 1,
+    alternating_row(NextN, Rest, FirstSymbol, SecondSymbol).
