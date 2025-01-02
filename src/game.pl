@@ -47,21 +47,27 @@ setup_game(Player1, Player2) :-
     write('Enter board size (between 9 and 15): '),
     read(BoardSize),
     (  integer(BoardSize), BoardSize >= 9, BoardSize =< 15, BoardSize mod 2 =:= 1
-    -> initial_state(GameConfig(BoardSize, Player1, Player2), GameState),
-       display_game(GameState),
-       game_loop(GameState)
+    -> initial_state(config(BoardSize, Player1, Player2), state),
+       display_game(state),
+       game_loop(state)
     ;  write('Invalid board size. Try again.'), nl,
        setup_game(Player1, Player2)
     ).
 
 % Display the game state
-display_game(+GameState(Board, CurrentPlayer, OtherInfo)) :-
-    nl, write('Current Player: '), write(CurrentPlayer), nl,
+display_game(state(Board, CurrentPlayer, OtherInfo)) :-
+    % Get stuff from OtherInfo
+    OtherInfo = other_info{player_names: [Player1Name, Player2Name], player_types: [Player1Type, Player2Type], move_history:_},
+    nl,
+    write('Current player: '), write(CurrentPlayer), nl,
+
+    % Display the board and column headers
     write('  '), display_column_headers(Board), nl,
-    display_rows(Board, 1),
-    OtherInfo = other_info{player_names: [Player1Name, Player2Name]},
-    write('Player 1 (Black): '), write(Player1Name), nl,
-    write('Player 2 (White): '), write(Player2Name), nl.
+    display_rows(Board, 1), nl.
+
+    % Display player names
+    write('Player 1: '), write(Player1Name), nl,
+    write('Player 2: '), write(Player2Name), nl.
 
 % Display column headers
 display_column_headers(Board) :-

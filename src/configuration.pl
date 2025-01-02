@@ -1,5 +1,5 @@
 % generate the initial board state for the game based on the configuration
-initial_state(+GameConfig(BoardSize, Player1Type, Player2Type), -GameState(Board, CurrentPlayer, OtherInfo)) :-
+initial_state(config(BoardSize, Player1Type, Player2Type), state(Board, CurrentPlayer, OtherInfo)) :-
     generate_board(BoardSize, Board), % generate the board configuration
     CurrentPlayer = Player1Type, % set player 1 as the initial player
     OtherInfo = other_info{
