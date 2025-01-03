@@ -5,18 +5,18 @@ display_game(state(Board, CurrentPlayer, OtherInfo)) :-
     nth1(2, PlayerNames, Player2Name),
     nl, write('Current player: '), write(CurrentPlayer), nl, nl,
 
-    % Display the board with column headers
-    write('     '), display_column_headers(Board), nl,
-    display_rows(Board, 1), nl,
+    % Get the board size and display the board with column headers
+    length(Board, BoardSize),  % Get the size of the board
+    write('     '), display_column_headers(BoardSize), nl,  % Pass the board size for column headers
+    display_rows(Board, 1, BoardSize), nl,  % Pass BoardSize to calculate the row numbering
 
     % Display player information
     write('Player 1 (black): '), write(Player1Name), nl,
     write('Player 2 (white): '), write(Player2Name), nl.
 
 % Display column headers
-display_column_headers(Board) :-
-    length(Board, Size),
-    display_numbers(1, Size).
+display_column_headers(BoardSize) :-
+    display_numbers(1, BoardSize).  % Adjusted to display correct number of columns
 
 % Display numbers for column headers
 display_numbers(Start, End) :-
@@ -26,13 +26,15 @@ display_numbers(Start, End) :-
     display_numbers(Next, End).
 display_numbers(_, _). % Stop when Start > End.
 
-% Display all rows with row numbers
-display_rows([], _).
-display_rows([Row|Rest], RowNumber) :-
-    format('~|~t~d~3| ', [RowNumber]), % Align row numbers
+% Display all rows with row numbers (adjusted for bottom-left coordinates)
+display_rows([], _, _). % No rows to display
+display_rows([Row|Rest], RowNumber, TotalRows) :-
+    % Calculate the new row number to be printed (1 = bottom row)
+    DisplayRowNumber is TotalRows - RowNumber + 1,
+    format('~|~t~d~3| ', [DisplayRowNumber]), % Align row numbers
     display_row(Row), nl,
     NextRow is RowNumber + 1,
-    display_rows(Rest, NextRow).
+    display_rows(Rest, NextRow, TotalRows).
 
 % Display a single row
 display_row([]).

@@ -1,5 +1,6 @@
 :- consult(configuration).
 :- consult(display).
+:- consult(movement).
 
 % Main entry point
 play :-
@@ -47,13 +48,45 @@ handle_game_type_choice(_) :-
 setup_game(Player1, Player2) :-
     write('Enter board size (between 9 and 15): '),
     read(BoardSize),
-    (  integer(BoardSize), BoardSize >= 9, BoardSize =< 15, BoardSize mod 2 =:= 1
-    -> initial_state(config(BoardSize, Player1, Player2), GameState),
-       display_game(GameState),
-       game_loop(GameState)
-    ;  write('Invalid board size. Try again.'), nl,
-       setup_game(Player1, Player2)
-    ).
+    validate_board_size(BoardSize, Player1, Player2).
 
-game_loop(state(Board, CurrentPlayer, OtherInfo)) :-
-    write('In progress...'), nl.
+% Helper predicate to validate the board size
+validate_board_size(BoardSize, Player1, Player2) :-
+    integer(BoardSize),
+    BoardSize >= 9,
+    BoardSize =< 15,
+    BoardSize mod 2 =:= 1,
+    initial_state(config(BoardSize, Player1, Player2), GameState),
+    display_game(GameState),
+    game_loop(GameState).
+
+validate_board_size(_, Player1, Player2) :-
+    write('Invalid board size. Try again.'), nl,
+    setup_game(Player1, Player2).
+
+% Main game loop
+game_loop(state(Board, CurrentPlayer, OtherInfo), Player1Type, Player2Type) :-
+    % Determine the next player type
+    (CurrentPlayer = Player1Type, NextPlayer = Player2Type;
+     CurrentPlayer = Player2Type, NextPlayer = Player1Type),
+    
+    % Handle the move for the current player (generic handling of player move)
+    current_player_move(Board, NewBoard, CurrentPlayer, NextPlayer, state(NewBoard, NextPlayer, OtherInfo)),
+    
+    % Update the game state (after move)
+    update_game_state(state(Board, CurrentPlayer, OtherInfo), NewBoard, CurrentPlayer, state(NewBoard, NextPlayer, OtherInfo)),
+    
+    % Display the updated game state
+    display_game(state(NewBoard, NextPlayer, OtherInfo)),
+    
+    % Recursively continue the game loop with the updated state
+    game_loop(state(NewBoard, NextPlayer, OtherInfo), Player1Type, Player2Type).
+
+% Handling the current players move (either human or computer)
+current_player_move(Board, NewBoard, human, NextPlayer, NewGameState) :-
+    human_move(Board, NewBoard, NextPlayer),
+    !.
+
+current_player_move(Board, NewBoard, computer, NextPlayer, NewGameState) :-
+    computer_move(Board, NewBoard, NextPlayer),
+    !.
