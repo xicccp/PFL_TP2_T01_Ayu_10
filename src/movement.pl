@@ -1,4 +1,5 @@
 :- consult(board).
+:- consult(utils).
 
 move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), move(Source, Destination), NewGameState) :-
     valid_move(Board, CurrentPlayer, Source, Destination), % Validate move
@@ -19,14 +20,12 @@ valid_moves(GameState, ListOfMoves) :-
 
 human_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), NewGameState) :-
     write('Enter the source position (e.g. 1 1): '),
-    read_line_to_string(user_input, SourceInput),
-    split_string(SourceInput, " ", "", SourceParts"),
-    maplist(number_string, [SourceX, SourceY], SourceParts),
+    read_line(SourceInput),
+    parse_coordinates(SourceInput, Source),
 
     write('Enter the destination position (e.g. 1 2): '),
-    read_line_to_string(user_input, DestinationInput),
-    split_string(DestinationInput, " ", "", DestinationParts),
-    maplist(number_string, [DestinationX, DestinationY], DestinationParts),
+    read(DestinationInput),
+    parse_coordinates(DestinationInput, Destination),
 
     Source = (SourceX, SourceY),
     Destination = (DestinationX, DestinationY),

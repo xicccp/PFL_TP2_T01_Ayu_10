@@ -7,7 +7,7 @@ display_game(state(Board, CurrentPlayer, NextPlayer, OtherInfo)) :-
 
     % Get the board size and display the board with column headers
     length(Board, BoardSize),  % Get the size of the board
-    write('     '), display_column_headers(BoardSize), nl,  % Pass the board size for column headers
+    write('   '), display_column_headers(BoardSize), nl,  % Pass the board size for column headers
     display_rows(Board, 1, BoardSize), nl,  % Pass BoardSize to calculate the row numbering
 
     % Display player information

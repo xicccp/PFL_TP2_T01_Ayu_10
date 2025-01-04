@@ -1,3 +1,5 @@
+:- use_module(library(lists)).
+
 find_group(Board, Player, Group) :-
     find_player_stones(Board, Player, Stones),
     explore_group(Board, Stones, Group).

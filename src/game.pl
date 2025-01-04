@@ -33,20 +33,20 @@ choose_game_type :-
 
 % Handle game type selection
 handle_game_type_choice(1) :-
-    setup_game(human1, human2).
+    setup_game(human, human).
 handle_game_type_choice(2) :-
     setup_game(human, computer).
 handle_game_type_choice(3) :-
     setup_game(computer, human).
 handle_game_type_choice(4) :-
-    setup_game(computer1, computer2).
+    setup_game(computer, computer).
 handle_game_type_choice(_) :-
     write('Invalid choice. Try again.'), nl,
     choose_game_type.
 
 % Game setup
 setup_game(Player1, Player2) :-
-    write('Enter board size (between 9 and 15): '),
+    write('Enter board size (odd number between 9 and 15): '),
     read(BoardSize),
     validate_board_size(BoardSize, Player1, Player2).
 
@@ -57,7 +57,6 @@ validate_board_size(BoardSize, Player1, Player2) :-
     BoardSize =< 15,
     BoardSize mod 2 =:= 1,
     initial_state(config(BoardSize, Player1, Player2), GameState),
-    display_game(GameState),
     game_loop(GameState).
 
 validate_board_size(_, Player1, Player2) :-
@@ -65,28 +64,29 @@ validate_board_size(_, Player1, Player2) :-
     setup_game(Player1, Player2).
 
 % Main game loop
-game_loop(state(Board, CurrentPlayer, OtherInfo), Player1Type, Player2Type) :-
-    % Determine the next player type
-    (CurrentPlayer = Player1Type, NextPlayer = Player2Type;
-     CurrentPlayer = Player2Type, NextPlayer = Player1Type),
+game_loop(GameState) :-
+    clear_screen,
+    % Display the updated game state
+    display_game(GameState),
     
     % Handle the move for the current player (generic handling of player move)
-    current_player_move(Board, NewBoard, CurrentPlayer, NextPlayer, state(NewBoard, NextPlayer, OtherInfo)),
-    
-    % Update the game state (after move)
-    update_game_state(state(Board, CurrentPlayer, OtherInfo), NewBoard, CurrentPlayer, state(NewBoard, NextPlayer, OtherInfo)),
-    
-    % Display the updated game state
-    display_game(state(NewBoard, NextPlayer, OtherInfo)),
-    
-    % Recursively continue the game loop with the updated state
-    game_loop(state(NewBoard, NextPlayer, OtherInfo), Player1Type, Player2Type).
+    current_player_move(GameState, NewGameState),
+    game_over(NewGameState), !.
+
+game_loop(GameState) :-
+    % Continue the game loop
+    game_loop(NewGameState).
 
 % Handling the current players move (either human or computer)
-current_player_move(Board, NewBoard, human, NextPlayer, NewGameState) :-
-    human_move(Board, NewBoard, NextPlayer),
+current_player_move(state(Board, human, NextPlayer, OtherInfo), NewGameState) :-
+    human_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), NewGameState),
     !.
 
-current_player_move(Board, NewBoard, computer, NextPlayer, NewGameState) :-
+current_player_move(state(Board, computer, NextPlayer, OtherInfo), NewGameState) :-
     computer_move(Board, NewBoard, NextPlayer),
     !.
+
+% End the game if a condition is met
+game_over(state(_, _, _, _)) :-
+    % Implement game-over logic here (e.g., victory condition)
+    fail.
