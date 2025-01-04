@@ -81,12 +81,20 @@ game_loop(GameState) :-
     game_loop(NewGameState).
 
 
+% Handling the current player's move (either human or computer)
+current_player_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), NewGameState) :-
+    OtherInfo = other_info(PlayerTypes, _, _),
+    nth1(1, PlayerTypes, Player1Type),
+    nth1(2, PlayerTypes, Player2Type),
+    (CurrentPlayer = b -> PlayerType = Player1Type ; PlayerType = Player2Type),
+    handle_player_move(PlayerType, state(Board, CurrentPlayer, NextPlayer, OtherInfo), NewGameState).
+
 % Handling the current players move (either human or computer)
-current_player_move(state(Board, human, NextPlayer, OtherInfo), NewGameState) :-
+handle_player_move(human, state(Board, CurrentPlayer, NextPlayer, OtherInfo), NewGameState) :-
     human_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), NewGameState),
     !.
 
-current_player_move(state(Board, computer, NextPlayer, OtherInfo), NewGameState) :-
+handle_player_move(computer, state(Board, CurrentPlayer, NextPlayer, OtherInfo), NewGameState) :-
     computer_move(Board, NewBoard, NextPlayer),
     !.
 

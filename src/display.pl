@@ -1,8 +1,10 @@
 % Display the entire game state
 display_game(state(Board, CurrentPlayer, NextPlayer, OtherInfo)) :-
-    OtherInfo = other_info(_, PlayerNames, _),
+    OtherInfo = other_info(PlayerTypes, PlayerNames, _),
     nth1(1, PlayerNames, Player1Name),
     nth1(2, PlayerNames, Player2Name),
+    nth1(1, PlayerTypes, Player1Type),
+    nth1(2, PlayerTypes, Player2Type),
     nl, write('Current player: '), write(CurrentPlayer), nl, nl,
 
     % Get the board size and display the board with column headers
@@ -11,8 +13,8 @@ display_game(state(Board, CurrentPlayer, NextPlayer, OtherInfo)) :-
     display_rows(Board, 1, BoardSize), nl,  % Pass BoardSize to calculate the row numbering
 
     % Display player information
-    write('Player 1 (black): '), write(Player1Name), nl,
-    write('Player 2 (white): '), write(Player2Name), nl.
+    write('Player 1 (black/b): '), write(Player1Type), nl,
+    write('Player 2 (white/w): '), write(Player2Type), nl.
 
 % Display column headers
 display_column_headers(BoardSize) :-
