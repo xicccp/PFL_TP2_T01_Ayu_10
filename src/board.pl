@@ -21,11 +21,26 @@ explore_connected(Board, [Stone|Rest], Visited, Group) :-
     append(Adjacent, Rest, NextStones),
     explore_connected(Board, NextStones, [Stone|Visited], Group).
 
-replace([Head|Tail], 0, NewElem, [NewElem|Tail]).
-replace([Head|Tail], Index, NewElem, [Head|NewTail]) :-
-    Index > 0,
-    NextIndex is Index - 1,
-    replace(Tail, NextIndex, NewElem, NewTail).
+replace(Board, (X, Y), NewElem, NewBoard) :-
+    length(Board, TotalRows),
+    RowIndex is TotalRows - Y + 1, % Transform to (1,1) at bottom left corner coordinates
+    nth1(RowIndex, Board, Row),
+    replace_row(Row, X, NewElem, NewRow),
+    replace_in_list(Board, RowIndex, NewRow, NewBoard).
+
+% Replaces an element in a row
+replace_row([_|Tail], 1, NewElem, [NewElem|Tail]).
+replace_row([Head|Tail], Index, NewElem, [Head|NewTail]) :-
+    Index > 1,
+    Index1 is Index - 1,
+    replace_row(Tail, Index1, NewElem, NewTail).
+
+% Replaces a row in the board
+replace_in_list([_|Tail], 1, NewRow, [NewRow|Tail]).
+replace_in_list([Head|Tail], Index, NewRow, [Head|NewTail]) :-
+    Index > 1,
+    Index1 is Index - 1,
+    replace_in_list(Tail, Index1, NewRow, NewTail).
 
 adjacent_empty_point(Board, Source, Destination) :-
     adjacent_position(Source, Adjacent),
@@ -40,11 +55,13 @@ adjacent_position((X, Y), (X1, Y1)) :-
     (X1 is X, Y1 is Y - 1).
 
 board_at(Board, (X, Y), PlayerOrEmpty) :-
-    nth0(Y, Board, Row),                % Get the row corresponding to Y
-    nth0(X, Row, PlayerOrEmpty).         % Get the element at position (X, Y)
+    length(Board, TotalRows),
+    RowIndex is TotalRows - Y + 1, % Transform to (1,1) at bottom left corner coordinates
+    nth1(RowIndex, Board, Row),
+    nth1(X, Row, PlayerOrEmpty).
 
 empty_position(Board, (X, Y)) :-
-    board_at(Board, (X, Y), empty).  % Check if the position is empty
+    board_at(Board, (X, Y), +).  % Check if the position is empty
 
 position_valid(Board, (X, Y)) :-
     length(Board, Rows),        % Get the number of rows

@@ -6,7 +6,9 @@ other_player(player2, player1).
 
 move(state(Board, CurrentPlayer, OtherInfo), move(Source, Destination), NewGameState) :-
     valid_move(Board, CurrentPlayer, Source, Destination), % Validate move
-    execute_move(Board, Source, Destination, NewBoard),    % Execute move
+    board_at(Board, Source, NewElem),                      % Get the element to move
+    replace(Board, Source, +, TempBoard),    % Execute move
+    replace(TempBoard, Destination, NewElem, NewBoard),
     other_player(CurrentPlayer, NextPlayer),               % Switch player
     NewGameState = state(NewBoard, NextPlayer, OtherInfo).  % Update game state
 
@@ -19,10 +21,6 @@ valid_moves(GameState, ListOfMoves) :-
              adjacent_empty_point(Board, Source, Destination), % Find adjacent empty points
              valid_move(Board, CurrentPlayer, Source, Destination)), % Check if move is valid
             ListOfMoves).
-
-execute_move(Board, Source, Destination, NewBoard) :-
-    replace(Board, Source, empty, TempBoard),               % Remove stone from Source
-    replace(TempBoard, Destination, stone, NewBoard).       % Place stone at Destination
 
 human_move(Board, NewBoard, NextPlayer) :-
     write('Enter your move (Source, Destination): '),
