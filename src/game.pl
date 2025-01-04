@@ -33,13 +33,13 @@ choose_game_type :-
 
 % Handle game type selection
 handle_game_type_choice(1) :-
-    setup_game(human, human).
+    setup_game(human1, human2).
 handle_game_type_choice(2) :-
     setup_game(human, computer).
 handle_game_type_choice(3) :-
     setup_game(computer, human).
 handle_game_type_choice(4) :-
-    setup_game(computer, computer).
+    setup_game(computer1, computer2).
 handle_game_type_choice(_) :-
     write('Invalid choice. Try again.'), nl,
     choose_game_type.

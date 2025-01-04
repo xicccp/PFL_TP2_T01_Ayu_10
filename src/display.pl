@@ -1,5 +1,5 @@
 % Display the entire game state
-display_game(state(Board, CurrentPlayer, OtherInfo)) :-
+display_game(state(Board, CurrentPlayer, NextPlayer, OtherInfo)) :-
     OtherInfo = other_info(_, PlayerNames, _),
     nth1(1, PlayerNames, Player1Name),
     nth1(2, PlayerNames, Player2Name),

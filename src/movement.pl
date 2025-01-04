@@ -1,16 +1,11 @@
 :- consult(board).
 
-% This predicate switches between Player1 and Player2
-other_player(player1, player2).
-other_player(player2, player1).
-
-move(state(Board, CurrentPlayer, OtherInfo), move(Source, Destination), NewGameState) :-
+move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), move(Source, Destination), NewGameState) :-
     valid_move(Board, CurrentPlayer, Source, Destination), % Validate move
     board_at(Board, Source, NewElem),                      % Get the element to move
     replace(Board, Source, +, TempBoard),    % Execute move
     replace(TempBoard, Destination, NewElem, NewBoard),
-    other_player(CurrentPlayer, NextPlayer),               % Switch player
-    NewGameState = state(NewBoard, NextPlayer, OtherInfo).  % Update game state
+    NewGameState = state(NewBoard, NextPlayer, CurrentPlayer, OtherInfo).  % Update game state
 
 valid_moves(GameState, ListOfMoves) :-
     GameState = state(Board, CurrentPlayer, _),
@@ -22,11 +17,20 @@ valid_moves(GameState, ListOfMoves) :-
              valid_move(Board, CurrentPlayer, Source, Destination)), % Check if move is valid
             ListOfMoves).
 
-human_move(Board, NewBoard, NextPlayer) :-
-    write('Enter your move (Source, Destination): '),
-    read(Move), % Read the move as a single variable
-    Move = (Source, Destination), % Ensure the move is a tuple
-    move(state(Board, human, _), Move, state(NewBoard, NextPlayer, _)).
+human_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), NewGameState) :-
+    write('Enter the source position (e.g. 1 1): '),
+    read_line_to_string(user_input, SourceInput),
+    split_string(SourceInput, " ", "", SourceParts"),
+    maplist(number_string, [SourceX, SourceY], SourceParts),
+
+    write('Enter the destination position (e.g. 1 2): '),
+    read_line_to_string(user_input, DestinationInput),
+    split_string(DestinationInput, " ", "", DestinationParts),
+    maplist(number_string, [DestinationX, DestinationY], DestinationParts),
+
+    Source = (SourceX, SourceY),
+    Destination = (DestinationX, DestinationY),
+    move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), move(Source, Destination), NewGameState).
 
 computer_move(Board, NewBoard, NextPlayer) :-
     valid_moves(state(Board, computer, _), ListOfMoves),
