@@ -78,11 +78,8 @@ game_loop(GameState) :-
     
     % Handle the move for the current player (generic handling of player move)
     current_player_move(GameState, NewGameState),
-    game_over(NewGameState), !.
-
-game_loop(GameState) :-
-    % Continue the game loop
     game_loop(NewGameState).
+
 
 % Handling the current players move (either human or computer)
 current_player_move(state(Board, human, NextPlayer, OtherInfo), NewGameState) :-

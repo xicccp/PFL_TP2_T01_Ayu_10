@@ -2,7 +2,7 @@
 :- consult(utils).
 
 move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), move(Source, Destination), NewGameState) :-
-    valid_move(Board, CurrentPlayer, Source, Destination), % Validate move
+    % valid_move(Board, CurrentPlayer, Source, Destination), % Validate move
     board_at(Board, Source, NewElem),                      % Get the element to move
     replace(Board, Source, +, TempBoard),    % Execute move
     replace(TempBoard, Destination, NewElem, NewBoard),
