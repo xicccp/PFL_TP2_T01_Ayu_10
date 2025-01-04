@@ -1,12 +1,14 @@
 :- consult(board).
 
-move(GameState, Move, NewGameState) :-
-    GameState = state(Board, CurrentPlayer, OtherInfo),
-    Move = (Source, Destination), % Unify Move with (Source, Destination)
+% This predicate switches between Player1 and Player2
+other_player(player1, player2).
+other_player(player2, player1).
+
+move(state(Board, CurrentPlayer, OtherInfo), move(Source, Destination), NewGameState) :-
     valid_move(Board, CurrentPlayer, Source, Destination), % Validate move
     execute_move(Board, Source, Destination, NewBoard),    % Execute move
-    update_game_state(state(Board, CurrentPlayer, OtherInfo),
-                      NewBoard, CurrentPlayer, NewGameState).
+    other_player(CurrentPlayer, NextPlayer),               % Switch player
+    NewGameState = state(NewBoard, NextPlayer, OtherInfo).  % Update game state
 
 valid_moves(GameState, ListOfMoves) :-
     GameState = state(Board, CurrentPlayer, _),
