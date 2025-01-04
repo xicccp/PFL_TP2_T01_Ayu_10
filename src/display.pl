@@ -1,5 +1,6 @@
 % Display the entire game state
 display_game(state(Board, CurrentPlayer, NextPlayer, OtherInfo)) :-
+    write('\33\[2J'), % Clear the screen
     OtherInfo = other_info(PlayerTypes, PlayerNames, _),
     nth1(1, PlayerNames, Player1Name),
     nth1(2, PlayerNames, Player2Name),

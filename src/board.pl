@@ -1,6 +1,30 @@
 :- use_module(library(lists)).
 
-find_group(Board, Player, Group) :-
+% shortest_path_distance/4: Computes the shortest path distance between two points.
+% Board: The game board.
+% Source: The starting position.
+% Target: The target position.
+% Distance: The shortest distance (number of moves) between Source and Target.
+shortest_path_distance(Board, Source, Target, Distance) :-
+    bfs(Board, [Source], Target, [], Distance).
+
+% bfs/5: Implements a breadth-first search to find the shortest path.
+% Board: The game board.
+% Frontier: The current set of positions being explored.
+% Target: The position we're trying to reach.
+% Visited: A list of already visited positions to prevent loops.
+% Distance: The distance to the target.
+bfs(_, [Target|_], Target, _, 0).
+bfs(Board, [Current|Rest], Target, Visited, Distance) :-
+    findall(Neighbor, (adjacent_position(Current, Neighbor), 
+                       board_at(Board, Neighbor, +),
+                       \+ member(Neighbor, Visited)),
+                    Neighbors),
+    append(Rest, Neighbors, NewFrontier),
+    bfs(Board, NewFrontier, Target, [Current|Visited], SubDistance),
+    Distance is SubDistance + 1.
+
+/* find_group(Board, Player, Group) :-
     find_player_stones(Board, Player, Stones),
     explore_group(Board, Stones, Group).
 
@@ -21,7 +45,7 @@ explore_connected(Board, [Stone|Rest], Visited, Group) :-
     \+ member(Stone, Visited),
     find_adjacent(Board, Stone, Adjacent),
     append(Adjacent, Rest, NextStones),
-    explore_connected(Board, NextStones, [Stone|Visited], Group).
+    explore_connected(Board, NextStones, [Stone|Visited], Group). */
 
 replace(Board, (X, Y), NewElem, NewBoard) :-
     length(Board, TotalRows),
@@ -44,17 +68,15 @@ replace_in_list([Head|Tail], Index, NewRow, [Head|NewTail]) :-
     Index1 is Index - 1,
     replace_in_list(Tail, Index1, NewRow, NewTail).
 
-adjacent_empty_point(Board, Source, Destination) :-
-    adjacent_position(Source, Adjacent),
-    empty_position(Board, Adjacent),  % Check if the adjacent position is empty
-    Destination = Adjacent.
-
-adjacent_position((X, Y), (X1, Y1)) :-
-    % Check orthogonal adjacency (up, down, left, right)
-    (X1 is X + 1, Y1 is Y);
-    (X1 is X - 1, Y1 is Y);
-    (X1 is X, Y1 is Y + 1);
-    (X1 is X, Y1 is Y - 1).
+% Checks if the position is adjacent
+adjacent_position((X, Y), (X1, Y)) :-
+    X1 is X + 1.
+adjacent_position((X, Y), (X1, Y)) :-
+    X1 is X - 1.
+adjacent_position((X, Y), (X, Y1)) :-
+    Y1 is Y + 1.
+adjacent_position((X, Y), (X, Y1)) :-
+    Y1 is Y - 1.
 
 board_at(Board, (X, Y), PlayerOrEmpty) :-
     length(Board, TotalRows),
@@ -67,7 +89,7 @@ empty_position(Board, (X, Y)) :-
 
 position_valid(Board, (X, Y)) :-
     length(Board, Rows),        % Get the number of rows
-    nth0(0, Board, FirstRow),   % Get the first row to determine the number of columns
+    nth1(1, Board, FirstRow),   % Get the first row to determine the number of columns
     length(FirstRow, Cols),
-    X >= 0, X < Cols,           % Check if X is within the column range
-    Y >= 0, Y < Rows.           % Check if Y is within the row range
+    X >= 1, X =< Cols,           % Check if X is within the column range
+    Y >= 1, Y =< Rows.           % Check if Y is within the row range

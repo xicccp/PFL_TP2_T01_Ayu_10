@@ -4,6 +4,7 @@
 
 % Main entry point
 play :-
+    write('\33\[2J'), % Clear the screen
     write('--- Welcome to Ayu ---'), nl,
     write('1. Play Ayu'), nl,
     write('2. Exit'), nl,
@@ -72,7 +73,6 @@ validate_board_size(_, Player1, Player2) :-
 
 % Main game loop
 game_loop(GameState) :-
-    write('\33\[2J'), % Clear the screen
     % Display the updated game state
     display_game(GameState),
     
