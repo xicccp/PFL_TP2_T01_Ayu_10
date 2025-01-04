@@ -4,4 +4,4 @@ parse_coordinates(Input, (X, Y)) :-
     number_codes(X, XCodes),
     number_codes(Y, YCodes).
 
-clear_screen :- write('\033[2J\033[H'). % ANSI escape sequence to clear the screen
+clear_screen :- write('\\033[2J\\033[H'). % ANSI escape sequence to clear the screen
