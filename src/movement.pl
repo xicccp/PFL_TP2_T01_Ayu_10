@@ -10,7 +10,7 @@ move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), move(Source, Destinatio
 
 closer_to_friendly(Board, CurrentPlayer, Source, Destination) :-
     findall(Pos, board_at(Board, Pos, CurrentPlayer), FriendlyPositions), % Find all friendly positions
-    findall(Dist-Friend, member(Friend, FriendlyPositions), shortest_path_distance(Board, Source, Friend, Dist), Distances), % Calculate distances to friendly positions
+    findall(Dist-Friend, member(Friend, FriendlyPositions), shortest_path_distance(Board, Source, Friend, _, Dist), Distances), % Calculate distances to friendly positions
     min_dist(ClosestDistance-ClosestFriend, Distances), % Find the closest friendly position
     shortest_path_distance(Board, Destination, ClosestFriend, NewDistance),
     NewDistance < ClosestDistance. % Check if the new distance is less than the closest distance

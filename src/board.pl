@@ -1,28 +1,22 @@
 :- use_module(library(lists)).
 
-% shortest_path_distance/4: Computes the shortest path distance between two points.
-% Board: The game board.
-% Source: The starting position.
-% Target: The target position.
-% Distance: The shortest distance (number of moves) between Source and Target.
-shortest_path_distance(Board, Source, Target, Distance) :-
-    bfs(Board, [Source], Target, [], Distance).
+shortest_path_with_distance(Board, Start, Target, Path, Distance) :-
+    bfs([[Start]-0], Board, Target, RevPath-Distance),
+    reverse(RevPath, Path).
 
-% bfs/5: Implements a breadth-first search to find the shortest path.
-% Board: The game board.
-% Frontier: The current set of positions being explored.
-% Target: The position we're trying to reach.
-% Visited: A list of already visited positions to prevent loops.
-% Distance: The distance to the target.
-bfs(_, [Target|_], Target, _, 0).
-bfs(Board, [Current|Rest], Target, Visited, Distance) :-
-    findall(Neighbor, (adjacent_position(Current, Neighbor), 
-                       board_at(Board, Neighbor, +),
-                       \+ member(Neighbor, Visited)),
-                    Neighbors),
-    append(Rest, Neighbors, NewFrontier),
-    bfs(Board, NewFrontier, Target, [Current|Visited], SubDistance),
-    Distance is SubDistance + 1.
+bfs([[Target | Rest]-D | _], _, Target, [Target | Rest]-D). % Found target
+bfs([[Current | Rest]-D | Queue], Board, Target, Path-Distance) :-
+    findall(
+        [Next, Current | Rest]-(D + 1),
+        (
+            adjacent_position(Current, Next),
+            (Next = Target; empty_position(Board, Next)),  % Allow target to be non-empty
+            \+ member(Next, [Current | Rest])  % Ensure we don't revisit nodes
+        ),
+        NewPaths
+    ),
+    append(Queue, NewPaths, NewQueue),
+    bfs(NewQueue, Board, Target, Path-Distance).
 
 /* find_group(Board, Player, Group) :-
     find_player_stones(Board, Player, Stones),
@@ -77,6 +71,9 @@ adjacent_position((X, Y), (X, Y1)) :-
     Y1 is Y + 1.
 adjacent_position((X, Y), (X, Y1)) :-
     Y1 is Y - 1.
+
+path((X, Y), (X1, Y1)) :- adjacent_position((X, Y), (X1, Y1)).
+path((X, Y), (X2, Y2)) :- adjacent_position((X, Y), (X1, Y1)), path((X1, Y1), (X2, Y2)).
 
 board_at(Board, (X, Y), PlayerOrEmpty) :-
     length(Board, TotalRows),

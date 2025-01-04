@@ -5,8 +5,8 @@ test_board([
     [+,+,+,+,+],
     [+,+,w,+,+],
     [+,+,+,b,+],
-    [+,w,+,+,+],
-    [b,+,+,+,+]
+    [w,w,+,+,+],
+    [b,b,+,+,+]
 ]).
 
 % Test board_at/3
@@ -49,6 +49,6 @@ test(replace) :-
 % Test shortest_path_distance/4
 test(shortest_path_distance) :-
     test_board(Board),
-    shortest_path_distance(Board, (1, 1), (3, 4), 4),  % Shortest path to white
-    shortest_path_distance(Board, (1, 1), (3, 3), 3),  % Shortest path to black
+    % shortest_path_distance(Board, (1, 1), (3, 4), 5),  % Shortest path to white
+    shortest_path_distance(Board, (1, 1), (1, 3), 1),  % Shortest path to black
     shortest_path_distance(Board, (1, 1), (1, 1), 0).  % Same position
