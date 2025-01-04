@@ -19,16 +19,14 @@ valid_moves(GameState, ListOfMoves) :-
             ListOfMoves).
 
 human_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), NewGameState) :-
-    write('Enter the source position (e.g. 1 1): '),
-    read_line(SourceInput),
-    parse_coordinates(SourceInput, Source),
-
-    write('Enter the destination position (e.g. 1 2): '),
-    read(DestinationInput),
-    parse_coordinates(DestinationInput, Destination),
-
+    write('Enter the source position (format "x,y."): '),
+    read((SourceX, SourceY)),
     Source = (SourceX, SourceY),
+
+    write('Enter the destination position (format "x,y."): '),
+    read((DestinationX, DestinationY)),
     Destination = (DestinationX, DestinationY),
+
     move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), move(Source, Destination), NewGameState).
 
 computer_move(Board, NewBoard, NextPlayer) :-

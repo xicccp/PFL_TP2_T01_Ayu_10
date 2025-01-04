@@ -9,19 +9,23 @@ play :-
     write('2. Exit'), nl,
     write('Choose an option: '),
     read(Choice),
+    write('\33\[2J'), % Clear the screen
     handle_menu_choice(Choice).
 
 % Handle menu options
 handle_menu_choice(1) :- % Start the game
     choose_game_type.
 handle_menu_choice(2) :- % Exit the game
+    write('\33\[2J'), % Clear the screen
     write('Goodbye!'), nl.
 handle_menu_choice(_) :- % Invalid option
+    write('\33\[2J'), % Clear the screen
     write('Invalid choice. Try again.'), nl,
     play.
 
 % Choose game type
 choose_game_type :-
+    write('\33\[2J'), % Clear the screen
     write('Choose game type:'), nl,
     write('1. Human vs Human (H/H)'), nl,
     write('2. Human vs Computer (H/PC)'), nl,
@@ -41,11 +45,13 @@ handle_game_type_choice(3) :-
 handle_game_type_choice(4) :-
     setup_game(computer, computer).
 handle_game_type_choice(_) :-
+    write('\33\[2J'), % Clear the screen
     write('Invalid choice. Try again.'), nl,
     choose_game_type.
 
 % Game setup
 setup_game(Player1, Player2) :-
+    write('\33\[2J'), % Clear the screen
     write('Enter board size (odd number between 9 and 15): '),
     read(BoardSize),
     validate_board_size(BoardSize, Player1, Player2).
@@ -60,12 +66,13 @@ validate_board_size(BoardSize, Player1, Player2) :-
     game_loop(GameState).
 
 validate_board_size(_, Player1, Player2) :-
+    write('\33\[2J'), % Clear the screen
     write('Invalid board size. Try again.'), nl,
     setup_game(Player1, Player2).
 
 % Main game loop
 game_loop(GameState) :-
-    clear_screen,
+    write('\33\[2J'), % Clear the screen
     % Display the updated game state
     display_game(GameState),
     
