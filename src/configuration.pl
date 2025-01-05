@@ -1,11 +1,12 @@
 :- use_module(library(lists)).
 
 % generate the initial board state for the game based on the configuration
-initial_state(config(BoardSize, Player1Type, Player2Type), state(Board, CurrentPlayer, OtherInfo)) :-
+initial_state(config(BoardSize, Player1Type, Player2Type), state(Board, CurrentPlayer, NextPlayer, OtherInfo)) :-
     generate_board(BoardSize, Board), % generate the board configuration
-    CurrentPlayer = Player1Type, % set player 1 as the initial player
-    OtherInfo = other_info([Player1Type, Player2Type], [Player1Type, Player2Type], []).
-  
+    CurrentPlayer = b, % set player black as the initial player
+    NextPlayer = w, % set player white as the next player
+    OtherInfo = other_info([Player1Type, Player2Type], [black, white], []). % set the player types and names
+
 % generates a board with size NxN
 generate_board(N, Board) :-
     length(Board, N),
