@@ -19,28 +19,21 @@ bfs([[Current | Rest]-D | Queue], Board, Target, Path-Distance) :-
     append(Queue, NewPaths, NewQueue),
     bfs(NewQueue, Board, Target, Path-Distance).
 
-/* find_group(Board, Player, Group) :-
-    find_player_stones(Board, Player, Stones),
-    explore_group(Board, Stones, Group).
+find_group(Board, Start, Player, Group) :-
+    flood_fill(Board, [Start], Player, [], Group).
 
-find_player_groups(Board, Player, Groups) :-
-    findall(Group, find_group(Board, Player, Group), Groups).
-
-find_player_stones(Board, Player, Stones) :-
-    findall((X, Y), (position_valid(Board, (X, Y)), board_at(Board, (X, Y), Player)), Stones).
-
-explore_group(Board, Stones, Group) :-
-    % This function explores all stones connected to the initial group.
-    % A stone is connected if it is adjacent to any other stone in the group.
-    % The exploration should respect orthogonal connectivity.
-    explore_connected(Board, Stones, [], Group).
-
-explore_connected(_, [], Visited, Visited).
-explore_connected(Board, [Stone|Rest], Visited, Group) :-
-    \+ member(Stone, Visited),
-    find_adjacent(Board, Stone, Adjacent),
-    append(Adjacent, Rest, NextStones),
-    explore_connected(Board, NextStones, [Stone|Visited], Group). */
+flood_fill(_, [], _, Visited, Group) :-
+    reverse(Visited, Group).
+flood_fill(Board, [Current | Rest], Player, Visited, Group) :-
+    \+ member(Current, Visited),
+    board_at(Board, Current, Player),
+    findall(Next,
+        (adjacent_position(Current, Next), board_at(Board, Next, Player)),
+        Neighbors),  % Find all valid neighbors
+    append(Neighbors, Rest, NewQueue),  % Add neighbors to the queue
+    flood_fill(Board, NewQueue, Player, [Current | Visited], Group).
+flood_fill(Board, [_ | Rest], Player, Visited, Group) :-
+    flood_fill(Board, Rest, Player, Visited, Group).  % Skip invalid positions
 
 replace(Board, (X, Y), NewElem, NewBoard) :-
     length(Board, TotalRows),
