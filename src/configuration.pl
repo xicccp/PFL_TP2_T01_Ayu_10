@@ -23,7 +23,7 @@ generate_rows(N, Index, []) :-
 
 % generates a single row with alternating pieces and empty intersections
 generate_row(N, Index, Row) :-
-    (Index mod 2 =:= 0 -> alternating_row(N, Row, +, b); alternating_row(N, Row, w, +)).
+    (Index mod 2 =:= 0 -> alternating_row(N, Row, w, +); alternating_row(N, Row, +, b)).
 
 % alternates between two symbols for N positions
 alternating_row(0, [], _, _).

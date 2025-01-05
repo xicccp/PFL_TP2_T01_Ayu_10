@@ -81,15 +81,15 @@ game_loop(GameState) :-
     handle_game_state(GameState, ListOfMoves).
 
 handle_game_state(GameState, []) :-
-    handle_win_condition(GameState).
+    game_over(GameState, Winner),
+    write('Player '), write(CurrentPlayer), write(' wins!'), nl.
+
 handle_game_state(GameState, ListOfMoves) :-
     current_player_move(GameState, ListOfMoves, NewGameState),
     game_loop(NewGameState).
 
-% Handle the win condition
-handle_win_condition(state(_, CurrentPlayer, NextPlayer, _)) :-
-    write('Player '), write(CurrentPlayer), write(' wins!'), nl.
-
+game_over(state(_, CurrentPlayer, _, _), Winner) :-
+    Winner = CurrentPlayer. 
 
 % Handling the current player's move (either human or computer)
 current_player_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), ListOfMoves, NewGameState) :-
@@ -112,9 +112,3 @@ handle_player_move(computer, state(Board, CurrentPlayer, NextPlayer, OtherInfo),
     Destination = (X1, Y1),
     format('Computer moved from (~w, ~w) to (~w, ~w)~n', [X, Y, X1, Y1]),
     sleep(4).
-
-
-% End the game if a condition is met
-game_over(state(_, _, _, _)) :-
-    % Implement game-over logic here (e.g., victory condition)
-    fail.
