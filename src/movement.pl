@@ -30,7 +30,6 @@ closer_to_friendly(Board, CurrentPlayer, Source, Destination) :-
     ), NewDistances),
     % Find the minimum distance to any friendly position from Destination
     min_member(NewClosestDist-_, NewDistances),
-    write(NewClosestDist), nl,
     NewClosestDist < ClosestDist.
 
 % Check if a move is valid
@@ -46,26 +45,32 @@ valid_move(Board, CurrentPlayer, Source, Destination) :-
 
 valid_moves(GameState, ListOfMoves) :-
     GameState = state(Board, CurrentPlayer, _),
-    find_player_groups(Board, CurrentPlayer, Groups),   % Identify player groups of stones
+    find_player_positions(Board, CurrentPlayer, Positions), % Find all player positions
     findall((Source, Destination),
-            (member(Group, Groups),
-             member(Source, Group),                         % For each stone in the group
+            (member(Source, Positions),                         % For each stone in the positions
              adjacent_empty_point(Board, Source, Destination), % Find adjacent empty points
              valid_move(Board, CurrentPlayer, Source, Destination)), % Check if move is valid
             ListOfMoves).
 
+find_player_positions(Board, Player, Positions) :-
+    findall((X, Y), (nth1(Y, Board, Row), nth1(X, Row, Player)), Positions).
+
 human_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), NewGameState) :-
+    get_source_position(Source),
+    get_destination_position(Destination),
+    move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), move(Source, Destination), NewGameState).
+
+get_source_position(Source) :-
     write('Enter the source position (format "x,y."): '),
     read((SourceX, SourceY)),
-    Source = (SourceX, SourceY),
+    Source = (SourceX, SourceY).
 
+get_destination_position(Destination) :-
     write('Enter the destination position (format "x,y."): '),
     read((DestinationX, DestinationY)),
-    Destination = (DestinationX, DestinationY),
-
-    move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), move(Source, Destination), NewGameState).
+    Destination = (DestinationX, DestinationY).
 
 computer_move(Board, NewBoard, NextPlayer) :-
     valid_moves(state(Board, computer, _), ListOfMoves),
-    random_member(Move, ListOfMoves), % Pick a random move
+    random_permutation(ListOfMoves, [Move|_]), % Shuffle the list and pick the first move
     move(state(Board, computer, _), Move, state(NewBoard, NextPlayer, _)).
