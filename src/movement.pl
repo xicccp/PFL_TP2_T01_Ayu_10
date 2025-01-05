@@ -44,6 +44,37 @@ valid_move(Board, CurrentPlayer, Source, Destination) :-
     % 4. Check if the destination brings the piece closer to closest friendly piece(s)
     closer_to_friendly(Board, CurrentPlayer, Source, Destination).
 
+% Returns a list of ValidMoves for groups
+valid_group_moves(Board, Group, ValidMoves) :-
+    findall(
+        ((AdjacentX, AdjacentY)),
+        (   
+            member(GroupPiece, Group),
+            adjacent_position(GroupPiece, (AdjacentX, AdjacentY)),
+            position_valid(Board, (AdjacentX, AdjacentY))
+        ), Edges
+    ),
+    findall(
+        (Source, Destination),
+        (
+            member(Source, Group),
+            member(Destination, Edges),
+            \+member(Destination, Group),
+            \+removes_from_group(Board, Group, Source, Destination)
+        ),
+        ValidMoves
+    ).
+
+% finds out if a move will remove a piece from a group
+removes_from_group(Board, Group, Source, Destination) :-
+    select(Source, Group, NewGroup),
+    \+ still_adjacent_to_group(Destination, NewGroup).
+
+still_adjacent_to_group(Destination, Group) :-
+    member(GroupPiece, Group),                    % For each piece in the group
+    adjacent_position(Destination, GroupPiece),   % Check if the destination is adjacent
+    !.                                            
+
 % Finds all valid moves for the current player
 valid_moves(state(Board, CurrentPlayer,_,_), ListOfMoves) :-
     find_player_positions(Board, CurrentPlayer, Positions), % Find all player positions
@@ -52,7 +83,15 @@ valid_moves(state(Board, CurrentPlayer,_,_), ListOfMoves) :-
             (member(Source, PositionsOG),
             adjacent_position(Source, (DestinationX, DestinationY)),                         % For each stone in the positions
             valid_move(Board, CurrentPlayer, Source, (DestinationX, DestinationY))), % Check if move is valid
-            ListOfMoves).
+            SinglePieceMoves),
+    find_all_groups(Board, CurrentPlayer, Groups),
+    findall(ValidMoves,
+    (
+        member(Group, Groups),
+        valid_group_moves(Board, Group, ValidMoves)
+    ), GroupMovesNested),
+    flatten(GroupMovesNested, GroupMoves),
+    append(SinglePieceMoves, GroupMoves, ListOfMoves).
 
 human_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), ListOfMoves, NewGameState) :-
     prompt_player_move(Source, Destination),
@@ -64,6 +103,7 @@ attempt_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), move(Source, De
 
 attempt_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), _, ListOfMoves, NewGameState) :-
     write('Invalid move. Try again.'), nl,
+    write(ListOfMoves), nl,
     human_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), ListOfMoves, NewGameState).
 
 prompt_player_move(Source, Destination) :-
