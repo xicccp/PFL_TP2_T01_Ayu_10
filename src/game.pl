@@ -63,6 +63,7 @@ validate_board_size(BoardSize, Player1, Player2) :-
     BoardSize >= 9,
     BoardSize =< 15,
     BoardSize mod 2 =:= 1,
+    % losing_state(config(_, Player1, Player2), GameState),
     initial_state(config(BoardSize, Player1, Player2), GameState),
     game_loop(GameState).
 
@@ -82,7 +83,7 @@ game_loop(GameState) :-
 
 handle_game_state(GameState, []) :-
     game_over(GameState, Winner),
-    write('Player '), write(CurrentPlayer), write(' wins!'), nl.
+    write('Player '), write(Winner), write(' wins!'), nl.
 
 handle_game_state(GameState, ListOfMoves) :-
     current_player_move(GameState, ListOfMoves, NewGameState),

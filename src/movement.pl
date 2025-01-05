@@ -60,7 +60,9 @@ valid_group_moves(Board, Group, ValidMoves) :-
             member(Source, Group),
             member(Destination, Edges),
             \+member(Destination, Group),
-            \+removes_from_group(Board, Group, Source, Destination)
+            \+removes_from_group(Board, Group, Source, Destination),
+            board_at(Board, Source, CurrentPlayer),
+            closer_to_friendly(Board, CurrentPlayer, Source, Destination)
         ),
         ValidMoves
     ).
@@ -103,7 +105,6 @@ attempt_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), move(Source, De
 
 attempt_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), _, ListOfMoves, NewGameState) :-
     write('Invalid move. Try again.'), nl,
-    write(ListOfMoves), nl,
     human_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), ListOfMoves, NewGameState).
 
 prompt_player_move(Source, Destination) :-
