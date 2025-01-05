@@ -91,8 +91,7 @@ current_player_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), NewGameS
 
 % Handling the current players move (either human or computer)
 handle_player_move(human, state(Board, CurrentPlayer, NextPlayer, OtherInfo), NewGameState) :-
-    human_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), NewGameState),
-    !.
+    human_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), NewGameState).
 
 handle_player_move(computer, state(Board, CurrentPlayer, NextPlayer, OtherInfo), NewGameState) :-
     computer_move(Board, NewBoard, NextPlayer),

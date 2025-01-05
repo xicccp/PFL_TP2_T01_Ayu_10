@@ -56,9 +56,20 @@ find_player_positions(Board, Player, Positions) :-
     findall((X, Y), (nth1(Y, Board, Row), nth1(X, Row, Player)), Positions).
 
 human_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), NewGameState) :-
+    prompt_player_move(Source, Destination),
+    attempt_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), move(Source, Destination), NewGameState).
+
+attempt_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), move(Source, Destination), NewGameState) :-
+    move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), move(Source, Destination), NewGameState),
+    !.
+
+attempt_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), move(Source, Destination), NewGameState) :-
+    write('Invalid move. Try again.'), nl,
+    human_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), NewGameState).
+
+prompt_player_move(Source, Destination) :-
     get_source_position(Source),
-    get_destination_position(Destination),
-    move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), move(Source, Destination), NewGameState).
+    get_destination_position(Destination).
 
 get_source_position(Source) :-
     write('Enter the source position (format "x,y."): '),
