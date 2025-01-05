@@ -4,6 +4,10 @@ shortest_path_with_distance(Board, Start, Target, Path, Distance) :-
     bfs([[Start]-0], Board, Target, RevPath-Distance),
     reverse(RevPath, Path).
 
+find_player_positions(Board, Player, Positions) :-
+    findall((X, Y), (nth1(Y, Board, Row), nth1(X, Row, Player)), Positions).
+
+
 bfs([[Target | Rest]-D | _], _, Target, [Target | Rest]-D):- % Found target
     !.
 bfs([[Current | Rest]-D | Queue], Board, Target, Path-Distance) :-
@@ -34,6 +38,15 @@ flood_fill(Board, [Current | Rest], Player, Visited, Group) :-
     flood_fill(Board, NewQueue, Player, [Current | Visited], Group).
 flood_fill(Board, [_ | Rest], Player, Visited, Group) :-
     flood_fill(Board, Rest, Player, Visited, Group).  % Skip invalid positions
+
+find_all_groups(Board, Player, GroupList) :-
+    findall(Group, (
+        find_player_positions(Board, Player, Positions),
+        maplist(convert_to_original_coords(Board), Positions, PositionsOG),
+        member((X, Y), PositionsOG),
+        find_group(Board, (X, Y), Player, Group),
+        length(Group, GroupSize),
+        GroupSize > 1), GroupList).
 
 replace(Board, (X, Y), NewElem, NewBoard) :-
     length(Board, TotalRows),

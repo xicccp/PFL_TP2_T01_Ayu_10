@@ -54,10 +54,6 @@ valid_moves(state(Board, CurrentPlayer,_,_), ListOfMoves) :-
             valid_move(Board, CurrentPlayer, Source, (DestinationX, DestinationY))), % Check if move is valid
             ListOfMoves).
 
-find_player_positions(Board, Player, Positions) :-
-    findall((X, Y), (nth1(Y, Board, Row), nth1(X, Row, Player)), Positions).
-
-
 human_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), ListOfMoves, NewGameState) :-
     prompt_player_move(Source, Destination),
     attempt_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), move(Source, Destination), ListOfMoves, NewGameState).
