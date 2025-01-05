@@ -44,14 +44,16 @@ valid_move(Board, CurrentPlayer, Source, Destination) :-
     closer_to_friendly(Board, CurrentPlayer, Source, Destination).
 
 % Finds all valid moves for the current player
-valid_moves(state(Board, CurrentPlayer,_,_) ListOfMoves) :-
-    find_player_positions(Board, CurrentPlayer, Positions), % Find all player positions
-    maplist(convert_to_original_coords(Board), Positions, PositionsOG), % Convert to requested coordinate system
-    findall((Source, Destination),
-            (member(Source, PositionsOG),
-            adjacent_position(Source, Destination),                         % For each stone in the positions
-            valid_move(Board, CurrentPlayer, Source, Destination)), % Check if move is valid
-            ListOfMoves).
+valid_moves(Board, CurrentPlayer, ListOfMoves) :-
+    findall(
+        Source-Destination,
+        (
+            board_at(Board, Source, CurrentPlayer), % Identify all sources with the current players pieces
+            adjacent_position(Source, Destination), % Generate adjacent positions as potential destinations
+            valid_move(Board, CurrentPlayer, Source, Destination) % Check if the move is valid
+        ),
+        ListOfMoves
+    ).
 
 find_player_positions(Board, Player, Positions) :-
     findall((X, Y), (nth1(Y, Board, Row), nth1(X, Row, Player)), Positions).

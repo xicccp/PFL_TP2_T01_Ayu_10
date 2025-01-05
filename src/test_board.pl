@@ -65,3 +65,59 @@ test(shortest_path_distance) :-
     % shortest_path_distance(Board, (1, 1), (3, 4), 5),  % Shortest path to white
     shortest_path_distance(Board, (1, 1), (1, 3), 1),  % Shortest path to black
     shortest_path_distance(Board, (1, 1), (1, 1), 0).  % Same position
+
+test(find_groups) :- 
+    test_board(Board),
+    find_groups(Board, w, Groups1),
+    Groups1 = [[(2, 1), (2, 2)]],  % Group of white pieces
+
+    find_groups(Board, b, Groups2),
+    Groups2 = [[(1, 1), (1, 2)]].  % Group of black pieces
+
+test(player_group) :- 
+    test_board(Board),
+    player_group(Board, w, Group1),
+    Group1 = [(2, 1), (2, 2)],  % Group of white pieces
+
+    player_group(Board, b, Group2),
+    Group2 = [(1, 1), (1, 2)].  % Group of black pieces
+
+test(find_group) :- 
+    test_board(Board),
+    find_group(Board, w, [(2, 1)], [], Group1),
+    Group1 = [(2, 1), (2, 2)],  % Group of white pieces
+
+    find_group(Board, b, [(1, 1)], [], Group2),
+    Group2 = [(1, 1), (1, 2)].  % Group of black pieces
+
+test(has_one_group) :- 
+    test_board(Board),
+    has_one_group(Board, w),  % White player has one group
+    \+ has_one_group(Board, b).  % Black player does not have one group (multiple groups)
+
+test(free_path) :- 
+    test_board(Board),
+    free_path(Board, [(2, 1)]),  % Free path between white pieces
+    \+ free_path(Board, [(1, 1)]).  % No free path between black pieces
+
+test(is_free_path) :- 
+    test_board(Board),
+    is_free_path(Board, (4, 4)),  % is empty
+    \+ is_free_path(Board, (2, 1)).  % is occupied by white
+
+test(has_free_path) :- 
+    test_board(Board),
+    has_free_path(Board, w),  % White player has a free path
+    \+ has_free_path(Board, b).  % Black player does not have a free path
+
+run_tests :-
+    test(find_groups),
+    test(player_group),
+    test(find_group),
+    test(has_one_group),
+    test(free_path),
+    test(is_free_path),
+    test(has_free_path),
+    write('All tests passed.'), nl.
+
+:- initialization(run_tests).

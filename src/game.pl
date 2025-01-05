@@ -77,15 +77,13 @@ game_loop(GameState) :-
     display_game(GameState),
 
     valid_moves(GameState, ListOfMoves),
-
-    (ListOfMoves == [] ) % TODO: compute valid list of moves here.
     
     % Handle the move for the current player (generic handling of player move)
     current_player_move(GameState, NewGameState),
     game_loop(NewGameState).
 
 
-% Handling the current player's move (either human or computer)
+% Handling the current players move (either human or computer)
 current_player_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), NewGameState) :-
     OtherInfo = other_info(PlayerTypes, _, _),
     nth1(1, PlayerTypes, Player1Type),

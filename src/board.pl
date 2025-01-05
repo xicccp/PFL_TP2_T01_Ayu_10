@@ -12,35 +12,37 @@ bfs([[Current | Rest]-D | Queue], Board, Target, Path-Distance) :-
         (
             adjacent_position(Current, Next),
             (Next = Target; empty_position(Board, Next)),  % Allow target to be non-empty
-            \+ member(Next, [Current | Rest])  % Ensure we don't revisit nodes
+            \+ member(Next, [Current | Rest])  % Ensure we dont revisit nodes
         ),
         NewPaths
     ),
     append(Queue, NewPaths, NewQueue),
     bfs(NewQueue, Board, Target, Path-Distance).
 
-/* find_group(Board, Player, Group) :-
-    find_player_stones(Board, Player, Stones),
-    explore_group(Board, Stones, Group).
+% Find all groups for a player
+find_groups(Board, Player, Groups) :-
+    findall(Group, player_group(Board, Player, Group), Groups).
 
-find_player_groups(Board, Player, Groups) :-
-    findall(Group, find_group(Board, Player, Group), Groups).
+player_group(Board, Player, Group) :-
+    findall(Point, board_at(Board, Point, Player), Points),  % Collect all occupied points
+    find_group(Board, Player, Points, [], Group).
 
-find_player_stones(Board, Player, Stones) :-
-    findall((X, Y), (position_valid(Board, (X, Y)), board_at(Board, (X, Y), Player)), Stones).
+% Find all stones connected to the current stone
+find_group(Board, Player, [Point|Rest], Visited, Group) :-
+    findall(AdjPoint,
+            (
+                adjacent_position(Point, AdjPoint),
+                board_at(Board, AdjPoint, Player),
+                \+ member(AdjPoint, Visited)
+            ),
+            AdjPoints),
+    append(Rest, AdjPoints, NewQueue),
+    find_group(Board, Player, NewQueue, [Point|Visited], Group).
+find_group(_, _, [], Group, Group).
 
-explore_group(Board, Stones, Group) :-
-    % This function explores all stones connected to the initial group.
-    % A stone is connected if it is adjacent to any other stone in the group.
-    % The exploration should respect orthogonal connectivity.
-    explore_connected(Board, Stones, [], Group).
-
-explore_connected(_, [], Visited, Visited).
-explore_connected(Board, [Stone|Rest], Visited, Group) :-
-    \+ member(Stone, Visited),
-    find_adjacent(Board, Stone, Adjacent),
-    append(Adjacent, Rest, NextStones),
-    explore_connected(Board, NextStones, [Stone|Visited], Group). */
+has_one_group(Board, Player) :-
+    find_groups(Board, Player, Groups),
+    length(Groups, 1).
 
 replace(Board, (X, Y), NewElem, NewBoard) :-
     length(Board, TotalRows),
@@ -95,3 +97,17 @@ position_valid(Board, (X, Y)) :-
     length(FirstRow, Cols),
     X >= 1, X =< Cols,           % Check if X is within the column range
     Y >= 1, Y =< Rows.           % Check if Y is within the row range
+
+free_path(Board, Group1, Group2) :-
+    bfs([Group1], Board, Group2).
+
+% Check if a position is free
+is_free_path(Board, Point) :-
+    board_at(Board, Point, +).  % Free positions are marked as '+'
+
+has_free_path(Board, Player) :-
+    find_groups(Board, Player, Groups),
+    member(Group1, Groups),
+    member(Group2, Groups),
+    Group1 \= Group2,
+    free_path(Board, Group1, Group2).
