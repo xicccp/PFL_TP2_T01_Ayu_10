@@ -75,6 +75,10 @@ validate_board_size(_, Player1, Player2) :-
 game_loop(GameState) :-
     % Display the updated game state
     display_game(GameState),
+
+    valid_moves(GameState, ListOfMoves),
+
+    (ListOfMoves == [] ) % TODO: compute valid list of moves here.
     
     % Handle the move for the current player (generic handling of player move)
     current_player_move(GameState, NewGameState),
