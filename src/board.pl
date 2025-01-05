@@ -40,13 +40,22 @@ flood_fill(Board, [_ | Rest], Player, Visited, Group) :-
     flood_fill(Board, Rest, Player, Visited, Group).  % Skip invalid positions
 
 find_all_groups(Board, Player, GroupList) :-
-    findall(Group, (
-        find_player_positions(Board, Player, Positions),
-        maplist(convert_to_original_coords(Board), Positions, PositionsOG),
-        member((X, Y), PositionsOG),
-        find_group(Board, (X, Y), Player, Group),
-        length(Group, GroupSize),
-        GroupSize > 1), GroupList).
+    find_player_positions(Board, Player, Positions),
+    maplist(convert_to_original_coords(Board), Positions, PositionsOG),
+    find_all_groups_helper(Board, Player, PositionsOG, [], GroupList).
+
+find_all_groups_helper(_, _, [], _, []).
+find_all_groups_helper(Board, Player, [Pos | Rest], Visited, [Group | OtherGroups]) :-
+    \+ member(Pos, Visited),
+    find_group(Board, Pos, Player, Group),         % Find group starting from this position
+    length(Group, GroupSize),
+    GroupSize > 1,                                 % Only consider groups larger than one piece
+    append(Group, Visited, NewVisited),            % Mark all group members as visited
+    find_all_groups_helper(Board, Player, Rest, NewVisited, OtherGroups).
+find_all_groups_helper(Board, Player, [Pos | Rest], Visited, OtherGroups) :-
+    (member(Pos, Visited);                         % If position is visited, or forms a group of size 1
+     find_group(Board, Pos, Player, Group), length(Group, GroupSize), GroupSize =< 1),
+    find_all_groups_helper(Board, Player, Rest, Visited, OtherGroups).
 
 replace(Board, (X, Y), NewElem, NewBoard) :-
     length(Board, TotalRows),
