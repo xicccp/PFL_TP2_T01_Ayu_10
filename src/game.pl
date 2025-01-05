@@ -89,7 +89,7 @@ handle_game_state(GameState, ListOfMoves) :-
     current_player_move(GameState, ListOfMoves, NewGameState),
     game_loop(NewGameState).
 
- Determines if the game is over and identifies the winner.
+% Determines if the game is over and identifies the winner.
 %
 % Arguments:
 % - state(_, CurrentPlayer, _, _): The current game state, where:
