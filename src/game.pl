@@ -78,7 +78,7 @@ game_loop(GameState) :-
 
     valid_moves(GameState, ListOfMoves),
 
-   handle_game_state(GameState, ListOfMoves).
+    handle_game_state(GameState, ListOfMoves).
 
 handle_game_state(GameState, []) :-
     handle_win_condition(GameState).
@@ -104,8 +104,15 @@ handle_player_move(human, state(Board, CurrentPlayer, NextPlayer, OtherInfo), Li
     human_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), ListOfMoves, NewGameState).
 
 handle_player_move(computer, state(Board, CurrentPlayer, NextPlayer, OtherInfo), ListOfMoves, NewGameState) :-
-    computer_move(Board, NewBoard, NextPlayer),
-    !.
+    write('Computer moving...'),
+    sleep(1), % artificial delay
+    choose_move(ListOfMoves, 1, move(Source, Destination)),
+    move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), move(Source, Destination), NewGameState),
+    Source = (X, Y),
+    Destination = (X1, Y1),
+    format('Computer moved from (~w, ~w) to (~w, ~w)~n', [X, Y, X1, Y1]),
+    sleep(4).
+
 
 % End the game if a condition is met
 game_over(state(_, _, _, _)) :-

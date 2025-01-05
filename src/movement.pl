@@ -1,5 +1,7 @@
 :- consult(board).
 :- consult(utils).
+:- use_module(library(random)).
+:- use_module(library(system)).
 
 move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), move(Source, Destination), NewGameState) :-
     board_at(Board, Source, NewElem),                      % Get the element to move
@@ -82,7 +84,5 @@ get_destination_position(Destination) :-
     read((DestinationX, DestinationY)),
     Destination = (DestinationX, DestinationY).
 
-computer_move(Board, NewBoard, NextPlayer) :-
-    valid_moves(state(Board, computer, _), ListOfMoves),
-    random_permutation(ListOfMoves, [Move|_]), % Shuffle the list and pick the first move
-    move(state(Board, computer, _), Move, state(NewBoard, NextPlayer, _)).
+choose_move(ListOfMoves, 1, move(Source, Destination)) :-
+    random_member((Source, Destination), ListOfMoves). % Pick a random move from the list
