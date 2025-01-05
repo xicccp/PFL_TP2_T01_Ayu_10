@@ -4,7 +4,8 @@ shortest_path_with_distance(Board, Start, Target, Path, Distance) :-
     bfs([[Start]-0], Board, Target, RevPath-Distance),
     reverse(RevPath, Path).
 
-bfs([[Target | Rest]-D | _], _, Target, [Target | Rest]-D). % Found target
+bfs([[Target | Rest]-D | _], _, Target, [Target | Rest]-D):- % Found target
+    !.
 bfs([[Current | Rest]-D | Queue], Board, Target, Path-Distance) :-
     findall(
         [Next, Current | Rest]-(D + 1),
@@ -75,9 +76,13 @@ adjacent_position((X, Y), (X, Y1)) :-
 path((X, Y), (X1, Y1)) :- adjacent_position((X, Y), (X1, Y1)).
 path((X, Y), (X2, Y2)) :- adjacent_position((X, Y), (X1, Y1)), path((X1, Y1), (X2, Y2)).
 
-board_at(Board, (X, Y), PlayerOrEmpty) :-
+get_pos(Board, (X, Y), PlayerOrEmpty) :- % Transform to (1,1) at bottom left corner coordinates
+    nth1(RowIndex, Board, Row),
+    nth1(X, Row, PlayerOrEmpty).
+
+board_at(Board, (X, Y), PlayerOrEmpty) :- % Transform to (1,1) at bottom left corner coordinates
     length(Board, TotalRows),
-    RowIndex is TotalRows - Y + 1, % Transform to (1,1) at bottom left corner coordinates
+    RowIndex is TotalRows - Y + 1,
     nth1(RowIndex, Board, Row),
     nth1(X, Row, PlayerOrEmpty).
 

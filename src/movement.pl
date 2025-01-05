@@ -8,12 +8,30 @@ move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), move(Source, Destinatio
     replace(TempBoard, Destination, NewElem, NewBoard),
     NewGameState = state(NewBoard, NextPlayer, CurrentPlayer, OtherInfo).  % Update game state
 
+remove_source(Source, List, Result) :-
+    select(Source, List, Result).
+
 closer_to_friendly(Board, CurrentPlayer, Source, Destination) :-
-    findall(Pos, board_at(Board, Pos, CurrentPlayer), FriendlyPositions), % Find all friendly positions
-    findall(Dist-Friend, member(Friend, FriendlyPositions), shortest_path_distance(Board, Source, Friend, _, Dist), Distances), % Calculate distances to friendly positions
-    min_dist(ClosestDistance-ClosestFriend, Distances), % Find the closest friendly position
-    shortest_path_distance(Board, Destination, ClosestFriend, NewDistance),
-    NewDistance < ClosestDistance. % Check if the new distance is less than the closest distance
+    findall((X, Y), (nth1(Y, Board, Row), nth1(X, Row, CurrentPlayer)), FriendlyPositions), % Find all friendly positions
+    maplist(convert_to_original_coords(Board), FriendlyPositions, FriendlyPositionsWithSource), 
+    % Remove the source position from the FriendlyPositionsOG list
+    remove_source(Source, FriendlyPositionsWithSource, FriendlyPositionsOG),
+    findall(Dist-Posi, (
+        member(Posi, FriendlyPositionsOG),
+        shortest_path_with_distance(Board, Source, Posi, _, Distance),
+        Dist is Distance  % Calculate distance from Source to each friendly position
+    ), Distances),
+    % Find the minimum distance to any friendly position from Source
+    min_member(ClosestDist-_, Distances),
+    findall(NewDist-NewPosi, (
+        member(Posi, FriendlyPositionsOG),
+        shortest_path_with_distance(Board, Destination, Posi, _, NewDistance),  % Calculate distance from Destination to each friendly position
+        NewDist is NewDistance  % Calculate distance from Source to each friendly position
+    ), NewDistances),
+    % Find the minimum distance to any friendly position from Destination
+    min_member(NewClosestDist-_, NewDistances),
+    write(NewClosestDist), nl,
+    NewClosestDist < ClosestDist.
 
 % Check if a move is valid
 valid_move(Board, CurrentPlayer, Source, Destination) :-

@@ -1,4 +1,5 @@
 :- consult('../src/board.pl').
+:- consult('../src/movement.pl').
 % A simple 5x5 board for testing:
 % (0,0) is the bottom-left, (4,4) is the top-right
 test_board([
@@ -7,6 +8,18 @@ test_board([
     [+,+,+,b,+],
     [w,w,+,+,+],
     [b,b,+,+,+]
+]).
+
+test_board9([
+    [+,+,+,+,+,+,+,+,+],
+    [+,+,+,+,+,+,+,+,+],
+    [+,+,+,+,+,+,+,+,+],
+    [+,+,+,b,b,b,+,+,+],
+    [+,+,+,b,+,b,+,+,+],
+    [+,+,+,b,b,b,+,+,+],
+    [w,+,+,+,+,+,+,+,+],
+    [w,+,+,+,+,+,+,+,+],
+    [+,+,w,+,w,+,+,+,+]
 ]).
 
 % Test board_at/3
