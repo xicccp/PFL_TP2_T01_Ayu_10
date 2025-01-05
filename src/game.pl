@@ -89,7 +89,7 @@ handle_game_state(GameState, ListOfMoves) :-
     current_player_move(GameState, ListOfMoves, NewGameState),
     game_loop(NewGameState).
 
-% Determines if the game is over and identifies the winner.
+ Determines if the game is over and identifies the winner.
 %
 % Arguments:
 % - state(_, CurrentPlayer, _, _): The current game state, where:
@@ -102,7 +102,7 @@ handle_game_state(GameState, ListOfMoves) :-
 %
 % Logic:
 % This predicate is simplistic and just returns the CurrentPlayer as the winner, because this predicate is only called
-when the win-condition is met.
+% when the win-condition is met.
 game_over(state(_, CurrentPlayer, _, _), Winner) :- 
     Winner = CurrentPlayer.  % Declare the CurrentPlayer as the winner (simplified).
 
