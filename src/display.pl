@@ -1,21 +1,38 @@
-% Display the entire game state
+% Display the entire game state.
+%
+% Arguments:
+% - state(Board, CurrentPlayer, NextPlayer, OtherInfo): The game state to display.
+%   - Board: The game board, represented as a 2D list of rows.
+%   - CurrentPlayer: The player whose turn it currently is ('b' for Black, 'w' for White).
+%   - NextPlayer: The player who will play next.
+%   - OtherInfo: Metadata about the game, including player types and names.
 display_game(state(Board, CurrentPlayer, NextPlayer, OtherInfo)) :-
-    write('\33\[2J'), % Clear the screen
-    OtherInfo = other_info(PlayerTypes, PlayerNames, _),
-    nth1(1, PlayerNames, Player1Name),
-    nth1(2, PlayerNames, Player2Name),
-    nth1(1, PlayerTypes, Player1Type),
-    nth1(2, PlayerTypes, Player2Type),
+    % Clear the screen to refresh the display for a clean view.
+    write('\33\[2J'),
+
+    % Extract player-related information from OtherInfo.
+    OtherInfo = other_info(PlayerTypes, PlayerNames, _), % Unpack player types and names.
+    nth1(1, PlayerNames, Player1Name),  % Get Player 1s name.
+    nth1(2, PlayerNames, Player2Name),  % Get Player 2s name.
+    nth1(1, PlayerTypes, Player1Type),  % Get Player 1s type (e.g., 'human' or 'AI').
+    nth1(2, PlayerTypes, Player2Type),  % Get Player 2s type (e.g., 'human' or 'AI').
+
+    % Display the current player and a blank line for spacing.
     nl, write('Current player: '), write(CurrentPlayer), nl, nl,
 
-    % Get the board size and display the board with column headers
-    length(Board, BoardSize),  % Get the size of the board
-    write('   '), display_column_headers(BoardSize), nl,  % Pass the board size for column headers
-    display_rows(Board, 1, BoardSize), nl,  % Pass BoardSize to calculate the row numbering
+    % Display the board.
+    % 1. Get the size of the board by calculating its length.
+    length(Board, BoardSize),
 
-    % Display player information
-    write('Player 1 (black/b): '), write(Player1Type), nl,
-    write('Player 2 (white/w): '), write(Player2Type), nl.
+    % 2. Display the column headers using BoardSize.
+    write('   '), display_column_headers(BoardSize), nl,
+
+    % 3. Display each row of the board, including row numbering.
+    display_rows(Board, 1, BoardSize), nl,
+
+    % Display additional player information.
+    write('Player 1 (black/b): '), write(Player1Type), nl,  % Show Player 1s type.
+    write('Player 2 (white/w): '), write(Player2Type), nl.  % Show Player 2s type.
 
 % Display column headers
 display_column_headers(BoardSize) :-

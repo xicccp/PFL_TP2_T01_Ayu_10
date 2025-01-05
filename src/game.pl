@@ -89,10 +89,25 @@ handle_game_state(GameState, ListOfMoves) :-
     current_player_move(GameState, ListOfMoves, NewGameState),
     game_loop(NewGameState).
 
-game_over(state(_, CurrentPlayer, _, _), Winner) :-
-    Winner = CurrentPlayer. 
+% Determines if the game is over and identifies the winner.
+%
+% Arguments:
+% - state(_, CurrentPlayer, _, _): The current game state, where:
+%     - _ represents the board, which is not used in this case (we dont need it for this check).
+%     - CurrentPlayer: The player whose turn it is currently, which will be the winner in this simplified case.
+%     - The other arguments (NextPlayer, OtherInfo) are not used here, as the predicate only cares about the CurrentPlayer.
+%
+% Returns:
+% - Winner: The player who is determined to have won (which is just the CurrentPlayer in this case).
+%
+% Logic:
+% This predicate is simplistic and just returns the CurrentPlayer as the winner, because this predicate is only called
+when the win-condition is met.
+game_over(state(_, CurrentPlayer, _, _), Winner) :- 
+    Winner = CurrentPlayer.  % Declare the CurrentPlayer as the winner (simplified).
 
-% Handling the current player's move (either human or computer)
+
+% Handling the current players move (either human or computer)
 current_player_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), ListOfMoves, NewGameState) :-
     OtherInfo = other_info(PlayerTypes, _, _),
     nth1(1, PlayerTypes, Player1Type),

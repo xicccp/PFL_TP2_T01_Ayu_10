@@ -1,11 +1,30 @@
 :- use_module(library(lists)).
 
-% generate the initial board state for the game based on the configuration
+% Generate the initial board state for the game based on the given configuration.
+% 
+% Arguments:
+% - config(BoardSize, Player1Type, Player2Type): Specifies the size of the board and the types of the players.
+% - state(Board, CurrentPlayer, NextPlayer, OtherInfo): The resulting initial state of the game, which includes:
+%   - Board: The initial configuration of the board with pieces placed for both players.
+%   - CurrentPlayer: The player who will take the first turn (Black).
+%   - NextPlayer: The player who will take the next turn (White).
+%   - OtherInfo: Additional information about the players and game context.
+
 initial_state(config(BoardSize, Player1Type, Player2Type), state(Board, CurrentPlayer, NextPlayer, OtherInfo)) :-
-    generate_board(BoardSize, Board), % generate the board configuration
-    CurrentPlayer = b, % set player black as the initial player
-    NextPlayer = w, % set player white as the next player
-    OtherInfo = other_info([Player1Type, Player2Type], [black, white], []). % set the player types and names
+    % 1. Generate the board with the specified size and initial placement of stones.
+    generate_board(BoardSize, Board),
+    
+    % 2. Set the initial player to Black ('b').
+    CurrentPlayer = b,
+
+    % 3. Set the next player to White ('w').
+    NextPlayer = w,
+
+    % 4. Include additional information:
+    %    - Player types (e.g., human or AI) provided in the configuration.
+    %    - Player colors ('black' for Black, 'white' for White).
+    %    - An empty list for any other game-specific metadata that might be added later.
+    OtherInfo = other_info([Player1Type, Player2Type], [black, white], []).
 
 losing_state(config(BoardSize, Player1Type, Player2Type), state(Board, CurrentPlayer, NextPlayer, OtherInfo)) :-
     BoardSize = 5,

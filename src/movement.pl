@@ -3,11 +3,30 @@
 :- use_module(library(random)).
 :- use_module(library(system)).
 
+% Execute a move in the game and update the game state.
+%
+% Arguments:
+% - state(Board, CurrentPlayer, NextPlayer, OtherInfo): The current game state.
+%   - Board: The 2D list representing the board.
+%   - CurrentPlayer: The player making the move ('b' for Black, 'w' for White).
+%   - NextPlayer: The player who will take the next turn.
+%   - OtherInfo: Additional game-related metadata.
+% - move(Source, Destination): The move to be performed.
+%   - Source: The coordinates of the piece to move.
+%   - Destination: The target coordinates where the piece will be moved.
+% - NewGameState: The updated game state after the move is executed.
 move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), move(Source, Destination), NewGameState) :-
-    board_at(Board, Source, NewElem),                      % Get the element to move
-    replace(Board, Source, +, TempBoard),    % Execute move
+    % 1. Get the element to move from the source position.
+    board_at(Board, Source, NewElem),
+
+    % 2. Replace the source position with an empty space ('+') to simulate the piece leaving.
+    replace(Board, Source, +, TempBoard),
+
+    % 3. Replace the destination position with the moved element (NewElem).
     replace(TempBoard, Destination, NewElem, NewBoard),
-    NewGameState = state(NewBoard, NextPlayer, CurrentPlayer, OtherInfo).  % Update game state
+
+    % 4. Update the game state with the modified board and switch players.
+    NewGameState = state(NewBoard, NextPlayer, CurrentPlayer, OtherInfo).
 
 remove_source(Source, List, Result) :-
     select(Source, List, Result).
@@ -77,22 +96,45 @@ still_adjacent_to_group(Destination, Group) :-
     adjacent_position(Destination, GroupPiece),   % Check if the destination is adjacent
     !.                                            
 
-% Finds all valid moves for the current player
-valid_moves(state(Board, CurrentPlayer,_,_), ListOfMoves) :-
-    find_player_positions(Board, CurrentPlayer, Positions), % Find all player positions
-    maplist(convert_to_original_coords(Board), Positions, PositionsOG), % Convert to requested coordinate system
+% Finds all valid moves for the current player.
+%
+% Arguments:
+% - state(Board, CurrentPlayer, _, _): The current game state, where:
+%   - Board: The current board configuration.
+%   - CurrentPlayer: The player whose turn it is to make a move.
+%   - Other elements (not used in this part of the predicate, but can be used in other cases).
+% - ListOfMoves: A list of valid moves for the current player, returned as output.
+valid_moves(state(Board, CurrentPlayer, _, _), ListOfMoves) :-
+    % 1. Find all the positions occupied by the current players pieces.
+    find_player_positions(Board, CurrentPlayer, Positions),
+
+    % 2. Convert these positions into the requested coordinate system (if necessary).
+    maplist(convert_to_original_coords(Board), Positions, PositionsOG),
+
+    % 3. Find all possible valid moves for the current players pieces.
     findall((Source, (DestinationX, DestinationY)),
-            (member(Source, PositionsOG),
-            adjacent_position(Source, (DestinationX, DestinationY)),                         % For each stone in the positions
-            valid_move(Board, CurrentPlayer, Source, (DestinationX, DestinationY))), % Check if move is valid
-            SinglePieceMoves),
+        (
+            member(Source, PositionsOG),
+            adjacent_position(Source, (DestinationX, DestinationY)),     % For each position, find adjacent positions.
+            valid_move(Board, CurrentPlayer, Source, (DestinationX, DestinationY)) % Check if the move is valid.
+        ),
+        SinglePieceMoves),
+
+    % 4. Find all groups of the current players pieces.
     find_all_groups(Board, CurrentPlayer, Groups),
+
+    % 5. For each group, find all valid moves for that group.
     findall(ValidMoves,
-    (
-        member(Group, Groups),
-        valid_group_moves(Board, Group, ValidMoves)
-    ), GroupMovesNested),
+        (
+            member(Group, Groups),
+            valid_group_moves(Board, Group, ValidMoves)
+        ),
+        GroupMovesNested),
+
+    % 6. Flatten the list of group moves (since `valid_group_moves` may return nested lists of moves).
     flatten(GroupMovesNested, GroupMoves),
+
+    % 7. Combine single piece moves and group moves into one list of valid moves.
     append(SinglePieceMoves, GroupMoves, ListOfMoves).
 
 human_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), ListOfMoves, NewGameState) :-

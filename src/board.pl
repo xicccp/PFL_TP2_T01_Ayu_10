@@ -16,7 +16,7 @@ bfs([[Current | Rest]-D | Queue], Board, Target, Path-Distance) :-
         (
             adjacent_position(Current, Next),
             (Next = Target; empty_position(Board, Next)),  % Allow target to be non-empty
-            \+ member(Next, [Current | Rest])  % Ensure we don't revisit nodes
+            \+ member(Next, [Current | Rest])  % Ensure we dont revisit nodes
         ),
         NewPaths
     ),
