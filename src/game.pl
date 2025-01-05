@@ -78,26 +78,32 @@ game_loop(GameState) :-
 
     valid_moves(GameState, ListOfMoves),
 
-    (ListOfMoves == [] ) % TODO: compute valid list of moves here.
-    
-    % Handle the move for the current player (generic handling of player move)
-    current_player_move(GameState, NewGameState),
+   handle_game_state(GameState, ListOfMoves).
+
+handle_game_state(GameState, []) :-
+    handle_win_condition(GameState).
+handle_game_state(GameState, ListOfMoves) :-
+    current_player_move(GameState, ListOfMoves, NewGameState),
     game_loop(NewGameState).
+
+% Handle the win condition
+handle_win_condition(state(_, CurrentPlayer, NextPlayer, _)) :-
+    write('Player '), write(CurrentPlayer), write(' wins!'), nl.
 
 
 % Handling the current player's move (either human or computer)
-current_player_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), NewGameState) :-
+current_player_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), ListOfMoves, NewGameState) :-
     OtherInfo = other_info(PlayerTypes, _, _),
     nth1(1, PlayerTypes, Player1Type),
     nth1(2, PlayerTypes, Player2Type),
     (CurrentPlayer = b -> PlayerType = Player1Type ; PlayerType = Player2Type),
-    handle_player_move(PlayerType, state(Board, CurrentPlayer, NextPlayer, OtherInfo), NewGameState).
+    handle_player_move(PlayerType, state(Board, CurrentPlayer, NextPlayer, OtherInfo), ListOfMoves, NewGameState).
 
 % Handling the current players move (either human or computer)
-handle_player_move(human, state(Board, CurrentPlayer, NextPlayer, OtherInfo), NewGameState) :-
-    human_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), NewGameState).
+handle_player_move(human, state(Board, CurrentPlayer, NextPlayer, OtherInfo), ListOfMoves, NewGameState) :-
+    human_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), ListOfMoves, NewGameState).
 
-handle_player_move(computer, state(Board, CurrentPlayer, NextPlayer, OtherInfo), NewGameState) :-
+handle_player_move(computer, state(Board, CurrentPlayer, NextPlayer, OtherInfo), ListOfMoves, NewGameState) :-
     computer_move(Board, NewBoard, NextPlayer),
     !.
 

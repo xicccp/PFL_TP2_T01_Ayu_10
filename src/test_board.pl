@@ -22,6 +22,18 @@ test_board9([
     [+,+,w,+,w,+,+,+,+]
 ]).
 
+tester([
+    [b, +, b, +, b, +, b, +, b],
+    [+, b, +, b, +, b, +, b, +],
+    [b, +, b, +, b, +, b, +, b],
+    [+, b, +, b, +, b, +, b, +],
+    [b, +, b, +, b, +, b, +, b],
+    [+, b, +, b, +, b, +, b, +],
+    [b, +, b, +, b, +, b, +, b],
+    [+, b, +, b, +, b, +, b, +],
+    [b, +, b, +, b, +, b, +, b]
+]).
+
 % Test board_at/3
 test(board_at) :-
     test_board(Board),
