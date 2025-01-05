@@ -2,7 +2,6 @@
 :- consult(utils).
 
 move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), move(Source, Destination), NewGameState) :-
-    valid_move(Board, CurrentPlayer, Source, Destination), % Validate move
     board_at(Board, Source, NewElem),                      % Get the element to move
     replace(Board, Source, +, TempBoard),    % Execute move
     replace(TempBoard, Destination, NewElem, NewBoard),
@@ -43,29 +42,31 @@ valid_move(Board, CurrentPlayer, Source, Destination) :-
     % 4. Check if the destination brings the piece closer to closest friendly piece(s)
     closer_to_friendly(Board, CurrentPlayer, Source, Destination).
 
-valid_moves(GameState, ListOfMoves) :-
-    GameState = state(Board, CurrentPlayer, _),
+% Finds all valid moves for the current player
+valid_moves(state(Board, CurrentPlayer,_,_), ListOfMoves) :-
     find_player_positions(Board, CurrentPlayer, Positions), % Find all player positions
-    findall((Source, Destination),
-            (member(Source, Positions),                         % For each stone in the positions
-             adjacent_empty_point(Board, Source, Destination), % Find adjacent empty points
-             valid_move(Board, CurrentPlayer, Source, Destination)), % Check if move is valid
+    maplist(convert_to_original_coords(Board), Positions, PositionsOG), % Convert to requested coordinate system
+    findall((Source, (DestinationX, DestinationY)),
+            (member(Source, PositionsOG),
+            adjacent_position(Source, (DestinationX, DestinationY)),                         % For each stone in the positions
+            valid_move(Board, CurrentPlayer, Source, (DestinationX, DestinationY))), % Check if move is valid
             ListOfMoves).
 
 find_player_positions(Board, Player, Positions) :-
     findall((X, Y), (nth1(Y, Board, Row), nth1(X, Row, Player)), Positions).
 
-human_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), NewGameState) :-
+
+human_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), ListOfMoves, NewGameState) :-
     prompt_player_move(Source, Destination),
-    attempt_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), move(Source, Destination), NewGameState).
+    attempt_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), move(Source, Destination), ListOfMoves, NewGameState).
 
-attempt_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), move(Source, Destination), NewGameState) :-
-    move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), move(Source, Destination), NewGameState),
-    !.
+attempt_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), move(Source, Destination), ListOfMoves, NewGameState) :-
+    member((Source, Destination), ListOfMoves),
+    move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), move(Source, Destination), NewGameState).
 
-attempt_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), move(Source, Destination), NewGameState) :-
+attempt_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), _, ListOfMoves, NewGameState) :-
     write('Invalid move. Try again.'), nl,
-    human_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), NewGameState).
+    human_move(state(Board, CurrentPlayer, NextPlayer, OtherInfo), ListOfMoves, NewGameState).
 
 prompt_player_move(Source, Destination) :-
     get_source_position(Source),
