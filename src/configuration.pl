@@ -7,6 +7,19 @@ initial_state(config(BoardSize, Player1Type, Player2Type), state(Board, CurrentP
     NextPlayer = w, % set player white as the next player
     OtherInfo = other_info([Player1Type, Player2Type], [black, white], []). % set the player types and names
 
+losing_state(config(BoardSize, Player1Type, Player2Type), state(Board, CurrentPlayer, NextPlayer, OtherInfo)) :-
+    BoardSize = 5,
+    Board = [
+        [+,b,b,+,+],
+        [w,w,w,+,w],
+        [+,+,b,+,+],
+        [+,+,b,w,w],
+        [+,+,b,b,+]
+    ],
+    CurrentPlayer = w,
+    NextPlayer = b,
+    OtherInfo = other_info([Player1Type, Player2Type], [black, white], []).
+
 % generates a board with size NxN
 generate_board(N, Board) :-
     length(Board, N),
@@ -23,7 +36,7 @@ generate_rows(N, Index, []) :-
 
 % generates a single row with alternating pieces and empty intersections
 generate_row(N, Index, Row) :-
-    (Index mod 2 =:= 0 -> alternating_row(N, Row, +, b); alternating_row(N, Row, w, +)).
+    (Index mod 2 =:= 0 -> alternating_row(N, Row, w, +); alternating_row(N, Row, +, b)).
 
 % alternates between two symbols for N positions
 alternating_row(0, [], _, _).

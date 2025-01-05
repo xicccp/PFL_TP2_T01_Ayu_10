@@ -11,15 +11,15 @@ test_board([
 ]).
 
 test_board9([
+    [+,+,+,+,+,+,+,w,+],
+    [+,+,+,+,+,+,w,w,+],
     [+,+,+,+,+,+,+,+,+],
-    [+,+,+,+,+,+,+,+,+],
-    [+,+,+,+,+,+,+,+,+],
-    [+,+,+,b,b,b,+,+,+],
+    [+,b,+,b,b,b,+,+,+],
     [+,+,+,b,+,b,+,+,+],
-    [+,+,+,b,b,b,+,+,+],
-    [w,+,+,+,+,+,+,+,+],
-    [w,+,+,+,+,+,+,+,+],
-    [+,+,w,+,w,+,+,+,+]
+    [+,b,+,b,b,b,+,+,+],
+    [w,b,+,+,+,+,+,+,+],
+    [b,+,w,+,+,+,+,+,+],
+    [w,+,w,+,w,+,+,+,+]
 ]).
 
 tester([
@@ -34,12 +34,20 @@ tester([
     [b, +, b, +, b, +, b, +, b]
 ]).
 
+test_find_all(Board, CurrentPlayer, GroupMoves, Groups) :-
+find_all_groups(Board, CurrentPlayer, Groups),
+    findall(ValidMoves,
+    (
+        member(Group, Groups),
+        valid_group_moves(Board, Group, ValidMoves)
+    ), GroupMoves).
+
 % Test board_at/3
 test(board_at) :-
     test_board(Board),
     board_at(Board, (3, 3), +), 
     board_at(Board, (3, 4), w),  
-    board_at(Board, (1, 1), b).  
+    board_at(Board, (1, 1), b).
 
 % Test empty_position/2
 test(empty_position) :-
